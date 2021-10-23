@@ -1,17 +1,17 @@
-#Maintainer: Martin Friedrich <npanic@acid.wtf>
-#Contributor: Martin Friedrich <npanic@acid.wtf>
-pkgname=kunst-git
-_pkgname=kunst
-pkgver=20190306
+#Maintainer: Tyjak <dev@tyjak.net>
+#Contributor: Tyjak <dev@tyjak.net>
+
+pkgname=funst-git
+_pkgname=funst
 pkgrel=1
-pkgdesc="kunst is a deamon that extracts the album art from the songs playing in mpd."
+pkgdesc="funst is a deamon that extracts the album art from the songs playing in mpd."
 arch=('any')
-url="https://github.com/sdushantha/kunst"
+url="https://github.com/tyjak/funst"
 license=('MIT')
 depends=('sxiv' 'imagemagick' 'bash' 'ffmpeg' 'mpc' 'dunst')
 makedepends=('git')
 provides=($_pkgname)
-source=("git+https://github.com/sdushantha/kunst.git")
+source=("git+https://github.com/tyjak/funst.git")
 md5sums=('SKIP')
 
 pkgver()
