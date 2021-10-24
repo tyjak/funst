@@ -243,16 +243,20 @@ generate_screensaver_image() {
 
 continue_display () {
     if [ $FIRST_RUN == false ] && [ "$MODE" != "notify" ]; then
-      $(ps -p $(cat /tmp/funst_${MODE}.pid) > /dev/null) && return 0 || exit 0
+
+        # if PID of display bin exists then continue
+        if $(ps -p $(cat ${TMP_DIR}funst_${MODE}.pid) > /dev/null); then
+            return 0
+        else
+            [ ! "$SILENT" ] && echo "funst: resume dunst notification"
+            [ "$MODE" == "screensaver" ] && dunstctl set-paused false
+            exit 0
+        fi
     fi
 }
 
 
 pre_exit() {
-    # In screen saver dunst is paused, on exit resume
-    if [ "$MODE" != "screensaver" ];then
-        dunstctl set-paused false
-    fi
         # Get the proccess ID of funst and kill it.
         # We are dumping the output of kill to /dev/null
         # because if the user quits sxiv before they
