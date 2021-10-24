@@ -257,12 +257,13 @@ continue_display () {
 
 
 pre_exit() {
-        # Get the proccess ID of funst and kill it.
-        # We are dumping the output of kill to /dev/null
-        # because if the user quits sxiv before they
-        # exit funst, an error will be shown
-        # from kill and we dont want that
-        kill -9 "$(cat /tmp/funst_${MODE}.pid)" &>/dev/null
+
+    # Get the proccess ID of funst and kill it.
+    # We are dumping the output of kill to /dev/null
+    # because if the user quits sxiv before they
+    # exit funst, an error will be shown
+    # from kill and we dont want that
+    kill -9 "$(cat ${TMP_DIR}funst_${MODE}.pid)" &>/dev/null
 }
 
 
