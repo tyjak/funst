@@ -215,6 +215,13 @@ generate_screensaver_image() {
 }
 
 
+continue_display () {
+    if [ $FIRST_RUN == false ] && [ "$MODE" != "notify" ]; then
+      $(ps -p $(cat /tmp/funst_${MODE}.pid) > /dev/null) && return 0 || exit 0
+    fi
+}
+
+
 pre_exit() {
     # In screen saver dunst is paused, on exit resume
     if [ "$SCREEN_SAVER" == true ];then
@@ -312,7 +319,7 @@ main() {
 
         # Waiting for an event from mpd; play/pause/next/previous
         # this is lets funst use less CPU :)
-        while true; do
+        while continue_display; do
             mpc idle player &>/dev/null && (mpc status | grep "\[playing\]" &>/dev/null) && break
         done
         [ ! "$SILENT" ] && echo "funst: received event from mpd"
