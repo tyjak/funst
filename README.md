@@ -1,17 +1,22 @@
+<div style="margin:auto; width:40%;">
+<p style="font-family: monospace; line-height:1.1em">
+·▄▄▄▄• ▄▌ ▐ ▄ .▄▄ · ▄▄▄▄▄<br/>
+▐▄▄·█▪██▌•█▌▐█▐█ ▀. •██  <br/>
+██▪ █▌▐█▌▐█▐▐▌▄▀▀▀█▄ ▐█.▪<br/>
+██▌.▐█▄█▌██▐█▌▐█▄▪▐█ ▐█▌·<br/>
+▀▀▀  ▀▀▀ ▀▀ █▪ ▀▀▀▀  ▀▀▀ <br/>
+</p>
+</div>
 <p align="center">
-·▄▄▄▄• ▄▌ ▐ ▄ .▄▄ · ▄▄▄▄▄
-▐▄▄·█▪██▌•█▌▐█▐█ ▀. •██  
-██▪ █▌▐█▌▐█▐▐▌▄▀▀▀█▄ ▐█.▪
-██▌.▐█▄█▌██▐█▌▐█▄▪▐█ ▐█▌·
-▀▀▀  ▀▀▀ ▀▀ █▪ ▀▀▀▀  ▀▀▀ 
-<br><sub>✨ Choose mode cover, notify or screen saver to display album art fromm your music library or online ✨</sub></p>
-```funst``` is a fork of ```kunst``` by Siddharth Dushantha (Copyright © 2019)
+<br><sub>✨ Choose mode cover, notify or screen saver to display album art from your music library or online ✨</sub></p>
+
 
 ```funst``` is a daemon that extracts the album art from the songs playing in ```mpd``` and displays them in a window or notification or screensaver. It doesn't loop on a timer, instead it waits for ```mpd``` to send a ```player``` event. When it receives a ```player``` event, it wakes up and extracts the album art of the current playing track. This makes ```funst```really lightweight and makes it idle at ```~0%``` CPU usage. If there no embbeded album art, it will try to fetch the album art from the internet.
 
+```funst``` is a fork of ```kunst``` by Siddharth Dushantha (Copyright © 2019)
 
-<p align="left">
-<img src="extra/demo.gif">
+<p align="center">
+<img src="extra/demo.gif" sytle="width:20%;height:20%">
 </a>
 </p>
 
