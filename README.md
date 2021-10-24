@@ -4,10 +4,10 @@
 ██▪ █▌▐█▌▐█▐▐▌▄▀▀▀█▄ ▐█.▪
 ██▌.▐█▄█▌██▐█▌▐█▄▪▐█ ▐█▌·
 ▀▀▀  ▀▀▀ ▀▀ █▪ ▀▀▀▀  ▀▀▀ 
-<br><sub>✨ Download and display album art or display embedded album art  ✨</sub></p>
+<br><sub>✨ Choose mode cover, notify or screen saver to display album art fromm your music library or online ✨</sub></p>
 ```funst``` is a fork of ```kunst``` by Siddharth Dushantha (Copyright © 2019)
 
-```funst``` is a daemon that extracts the album art from the songs playing in ```mpd``` and displays them in a notification or ont the i3lock screen. It doesn't loop on a timer, instead it waits for ```mpd``` to send a ```player``` event. When it receives a ```player``` event, it wakes up and extracts the album art of the current playing track. This makes ```funst```really lightweight and makes it idle at ```~0%``` CPU usage. If there no embbeded album art, it will try to fetch the album art from the internet.
+```funst``` is a daemon that extracts the album art from the songs playing in ```mpd``` and displays them in a window or notification or screensaver. It doesn't loop on a timer, instead it waits for ```mpd``` to send a ```player``` event. When it receives a ```player``` event, it wakes up and extracts the album art of the current playing track. This makes ```funst```really lightweight and makes it idle at ```~0%``` CPU usage. If there no embbeded album art, it will try to fetch the album art from the internet.
 
 
 <p align="left">
@@ -57,7 +57,7 @@ $ cp funst.service /usr/lib/systemd/user/ && systemctl --user enable --now funst
 
 ```bash
 $ funst --help
-usage: funst [-h] [--size px] [--music_dir path/to/dir] [--silent] [--notify-send] [--version]
+usage: funst [-h] [--size px] [--music_dir path/to/dir] [--silent] [--notify-send] [--screen-saver] [--version]
 
 
 
@@ -66,7 +66,7 @@ usage: funst [-h] [--size px] [--music_dir path/to/dir] [--silent] [--notify-sen
 ██▪ █▌▐█▌▐█▐▐▌▄▀▀▀█▄ ▐█.▪
 ██▌.▐█▄█▌██▐█▌▐█▄▪▐█ ▐█▌·
 ▀▀▀  ▀▀▀ ▀▀ █▪ ▀▀▀▀  ▀▀▀ 
-Download and display album art or display embedded album art
+Choose mode cover, notify or screen saver to display album art fromm your music library or online
 
 optional arguments:
    -h, --help            show this help message and exit
@@ -75,6 +75,7 @@ optional arguments:
    --music_dir           the music directory which MPD plays from
    --silent              dont show the output
    --notify-send         send album image in a notification along side with artist, title and duration
+   --screen-saver        display album cover on a blurry image of your desktop in full screen
    --version             show the version of funst you are using
 ```
 

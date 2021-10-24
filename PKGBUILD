@@ -3,8 +3,9 @@
 
 pkgname=funst-git
 _pkgname=funst
+pkgver=20211024
 pkgrel=1
-pkgdesc="funst is a deamon that extracts the album art from the songs playing in mpd."
+pkgdesc="daemon that extracts and modaly display the album art from the songs playing in mpd"
 arch=('any')
 url="https://github.com/tyjak/funst"
 license=('MIT')

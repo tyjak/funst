@@ -1,8 +1,8 @@
-pkgbase = kunst
-	pkgdesc = kunst is a deamon that extracts the album art from the songs playing in mpd.
-	pkgver = 20190215
+pkgbase = funst-git
+	pkgdesc = daemon that extracts and modaly display the album art from the songs playing in mpd
+	pkgver = 20211024
 	pkgrel = 1
-	url = https://github.com/networkpanic/kunst.git
+	url = https://github.com/tyjak/funst
 	arch = any
 	license = MIT
 	makedepends = git
@@ -11,9 +11,9 @@ pkgbase = kunst
 	depends = bash
 	depends = ffmpeg
 	depends = mpc
-	provides = kunst
-	source = git+https://github.com/networkpanic/kunst.git
+	depends = dunst
+	provides = funst
+	source = git+https://github.com/tyjak/funst.git
 	md5sums = SKIP
 
-pkgname = kunst
-
+pkgname = funst-git
