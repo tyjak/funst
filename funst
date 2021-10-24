@@ -214,6 +214,8 @@ update_cover() {
         COVER_MODE=${TMP_DIR}${COVER}_${MODE}${IMAGE_EXTENSION}
         convert "$ORIG_COVER" -resize "$SIZE" "$COVER_MODE" &> /dev/null
         [ ! "$SILENT" ] && echo "funst: resized album art to $SIZE"
+    else
+        COVER_MODE=${ORIG_COVER}
     fi
 
 }
