@@ -260,6 +260,8 @@ continue_display () {
 
 pre_exit() {
 
+    [ ! "$SILENT" ] && echo "funst: resume dunst notification"
+    [ "$MODE" == "screensaver" ] && dunstctl set-paused false
     # Get the proccess ID of funst and kill it.
     # We are dumping the output of kill to /dev/null
     # because if the user quits sxiv before they
