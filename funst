@@ -9,11 +9,10 @@
 # Dependencies: sxiv, imagemagick, bash, ffmpeg, mpc, jq, mpd, dunst
 
 
-VERSION=1.3.2
-COVER=/tmp/funst.png
-ORIG_COVER=/tmp/funst_original.png
-SCREEN_COVER=/tmp/funst_screen.png
-SCREEN_DESKTOP=/tmp/funst_desktop.png
+VERSION=1.4.0
+TMP_DIR=/tmp/
+IMAGE_EXTENSION=.png
+COVER=funst
 MUSIC_DIR=~/Music/
 SIZE=450x450
 ICONSIZE=70x70
@@ -71,9 +70,11 @@ while true; do
             ;;
         --notify-send)
             NOTIFY=true
+            MODE='notify'
             ;;
         --screen-saver)
             SCREEN_SAVER=true
+            MODE='screensaver'
             ;;
         --version)
             echo $VERSION
@@ -100,6 +101,9 @@ read -r -d '' MUSIC_NOTE << EOF
 iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAJESURBVGhD7Zg/axRRFMVXAtpYphEVREKClnHfJI0MmReSfAC3tRejhaBgo70fwN7aD2BvEU0gfztbu5AqMxNjoVnvG87KZXy7z5m5dxLI/OCw8Pade+7M3n3Dbq+jo6OjY8RwMJhKk+hhlph3eRJ9w/LF5jCOr1PTj6jpD7mNjkjDkbDl4vFjpX87teZJlkSfSD9501zYfv5QJ1fyZHGexuJtZs12ZqMzX8NlwX4+nK3NXMutWaOm39Nd/u5rMCSUao80fjBNwY+p8Y+krNxQVaGsLsfWzFLYS2r4M30Rf5WbaCJE6OILlhIidPEFSwkRuviCpYQIXXzB1WX26bR6ky4v3OPriNCFB1YRHa079Pr6eKk/h1IFfA+WdOGBk+QeXtT0Ft3pV6e2fxf2f+AeLOnCA8tC0xv09H1xGi/cgWUi3I8lXXigEzX8u3gmWPP8JI5uYdt/w2thSRceSM0/zVfnb+CtWvB6WNJFOlC6XhDpQOl6QaQDpesFkQ6UrhdEOlC6XpA6gcPB/avumKXnxCadXHkha766tTr1GlE18CRZvEmN7nHfOMGiS5XA4mdmYg64Z5Jg06VKYHlEQoKtOVIz6zx8f0iwNUNyZt2F+3zjBFt9pGe22gWYFLb6lEckJNjGUmWEssR8ga0+0jNL9Z75fD7Rp7UOW32kZxb/1u37vFyUu+sODtjqozGzxaFADfprFM3vuD3Y3gytmf17LJPHXbgTNb5BWhe58yNan1lpWp9ZDVqdWS1am9mOjo7LRq/3B1ESKyYUVquzAAAAAElFTkSuQmCC
 EOF
 
+get_nocover () {
+    echo "$MUSIC_NOTE" | base64 --decode > "$ORIG_COVER"
+}
 
 is_connected() {
     # Check if internet is connected. We are using api.deezer.com to test
@@ -140,8 +144,9 @@ get_cover_online() {
     else
         [ ! "$SILENT" ] && echo "funst: cover found online"
         # FIXME: we suppose the img provide by deezer is always jpg but needs to be catched
-        curl -o "${ORIG_COVER}.jpg" -s "$IMG_URL"
-        convert "${ORIG_COVER}.jpg" $ORIG_COVER &> /dev/null
+        ONLINE_IMG=${TMP_DIR}${COVER}.jpg
+        curl -o "$ONLINE_IMG" -s "$IMG_URL"
+        convert "$ONLINE_IMG" $ORIG_COVER &> /dev/null
         ARTLESS=false
     fi
 
@@ -187,29 +192,50 @@ find_album_art(){
         [ ! "$SILENT" ] && echo "error: file does not have an album art"
         get_cover_online
     fi
+
+    if [ "$ARTLESS" == true ];then
+        [ ! "$SILENT" ] && echo "funst: default image for no cover"
+        get_nocover
+    fi
+
 }
 
 
 update_cover() {
+    ORIG_COVER=${TMP_DIR}${COVER}_original${IMAGE_EXTENSION}
+
     find_album_art
 
-    if [ "$SCREEN_SAVER" == true ]; then
+    [ ! "$SILENT" ] && echo "funst: update cover with mode : $MODE"
+    if [ "$MODE" == "screensaver" ]; then
         update_screen_cover
     elif [ "$ARTLESS" == false ]; then
-        convert "$ORIG_COVER" -resize "$SIZE" "$COVER" &> /dev/null
+        [ "$MODE" == "notify" ] && SIZE=$ICONSIZE
+        COVER_MODE=${TMP_DIR}${COVER}_${MODE}${IMAGE_EXTENSION}
+        convert "$ORIG_COVER" -resize "$SIZE" "$COVER_MODE" &> /dev/null
         [ ! "$SILENT" ] && echo "funst: resized album art to $SIZE"
     fi
 
 }
 
 update_screen_cover() {
+
+    SCREEN_COVER=${TMP_DIR}${COVER}_screen${IMAGE_EXTENSION}
+    SCREEN_COVER_SHADOW=${TMP_DIR}${COVER}_screen_shadow${IMAGE_EXTENSION}
+
     # produce screen saver image
-    convert "$ORIG_COVER" \( +clone -background black -shadow 50x10+15+15 \) +swap -background none -layers merge +repage -resize "$SIZE" ${SCREEN_COVER}.shadow
-    convert $SCREEN_DESKTOP \( ${SCREEN_COVER}.shadow -background none -gravity center \) -gravity center -composite $SCREEN_COVER
+    if [ $ARTLESS == "true" ]; then
+        convert "$ORIG_COVER" "$SCREEN_COVER_SHADOW"
+    else
+        convert "$ORIG_COVER" \( +clone -background black -shadow 50x10+15+15 \) +swap -background none -layers merge +repage -resize "$SIZE" "$SCREEN_COVER_SHADOW"
+    fi
+    convert "$SCREEN_DESKTOP" \( "$SCREEN_COVER_SHADOW" -background none -gravity center \) -gravity center -composite "$SCREEN_COVER"
 }
 
 
 generate_screensaver_image() {
+    SCREEN_DESKTOP=${TMP_DIR}${COVER}_desktop${IMAGE_EXTENSION}
+    [ ! "$SILENT" ] && echo "funst: generate desktop blur image"
     maim -u > $SCREEN_DESKTOP
     convert $SCREEN_DESKTOP -filter Gaussian -blur 0x2 $SCREEN_DESKTOP
 }
@@ -224,19 +250,17 @@ continue_display () {
 
 pre_exit() {
     # In screen saver dunst is paused, on exit resume
-    if [ "$SCREEN_SAVER" == true ];then
+    if [ "$MODE" != "screensaver" ];then
         dunstctl set-paused false
-        kill -9 "$(cat /tmp/funst_screensaver.pid)" &>/dev/null
-    else
+    fi
         # Get the proccess ID of funst and kill it.
         # We are dumping the output of kill to /dev/null
         # because if the user quits sxiv before they
         # exit funst, an error will be shown
         # from kill and we dont want that
-        kill -9 "$(cat /tmp/funst.pid)" &>/dev/null
-    fi
-
+        kill -9 "$(cat /tmp/funst_${MODE}.pid)" &>/dev/null
 }
+
 
 main() {
 
@@ -258,63 +282,43 @@ main() {
     # Flag to run some commands only once in the loop
     FIRST_RUN=true
 
-    # Set send-notify via env var FUNST_MODE
-    if [ "$MODE" == "notify" ];then
-        NOTIFY=true
-    fi
-
-    if [ "$SCREEN_SAVER" == true ];then
+    if [ "$MODE" == "screensaver" ];then
         generate_screensaver_image
     fi
 
     while true; do
 
-        if [ "$NOTIFY" == true ];then
-            SIZE=$ICONSIZE
-        fi
-
         update_cover
-
-        if [ "$ARTLESS" == true ];then
-            # Decode the base64 encoded image and save it
-            # to /tmp/funst.png
-            echo "$MUSIC_NOTE" | base64 --decode > "$COVER"
-            if [ "$SCREEN_SAVER" == true ];then
-                ORIG_COVER=$COVER
-                update_screen_cover
-            fi
-        fi
 
         if [ ! "$SILENT" ];then
             echo "funst: swapped album art to $(mpc current)"
             printf '%*s\n' "${COLUMNS:-$(tput cols)}" '' | tr ' ' -
         fi
 
-        if [ "$NOTIFY" == true ];then
+        if [ "$MODE" == "notify" ];then
 
             # Display art album with artist name, song title and duration
             notify-send \
                 "$(mpc current --format "[%artist%]|Now Playing ♫")" \
                 "$(mpc current --format "<small><i>[%title%]</i>\n[%time%]</small>")" \
-                -i "$COVER" \
+                -i "$COVER_MODE" \
                 -a funst
 
         elif [ "$FIRST_RUN" == true ]; then
             FIRST_RUN=false
 
-            #screen saver mode
-            if [ "$SCREEN_SAVER" == true ];then
-                # Display album cover over the desktop blur image
+            # Display the album art using sxiv
+            if [ "$MODE" == "screensaver" ];then
+                # pause notification
                 dunstctl set-paused true
                 sxiv -f -b $SCREEN_COVER -N "funst" &
-                echo $! >/tmp/funst_screensaver.pid
             else
-                # Display the album art using sxiv
-                sxiv -g "$SIZE$POSITION" -b "$COVER" -N "funst" &
-                # Save the process ID so that we can kill
-                # sxiv when the user exits the script
-                echo $! >/tmp/funst.pid
+                sxiv -g "$SIZE$POSITION" -b "$COVER_MODE" -N "funst" &
             fi
+
+            # Save the process ID so that we can kill
+            # sxiv when the user exits the script
+            echo $! >/tmp/funst_${MODE}.pid
         fi
 
         # Waiting for an event from mpd; play/pause/next/previous
